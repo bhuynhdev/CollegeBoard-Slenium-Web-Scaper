@@ -1,8 +1,8 @@
 from selenium import webdriver
-# from selenium.common.exceptions import TimeoutException
-# from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import constants as const
 from constants import DEADLINE, ADMISSION, COST
 
@@ -62,8 +62,12 @@ class CollegeBoardScaper:
     def scrape_cost(self):
         cost_tab = self.driver.find_element_by_link_text(COST)
         self.click(cost_tab)
-
-        out_of_state_tab = self.driver.find_element_by_xpath('//*[@id="cpProfile_tabs_paying_outstatecosts_anchor"]/a')
+        # Wait for the Cost page to load fully; it loads quite slowly
+        out_of_state_xpath = '//*[@id="cpProfile_tabs_paying_outstatecosts_anchor"]/a'
+        out_of_state_tab = WebDriverWait(driver, 30).until(
+                EC.presence_of_element_located((By.XPATH, out_of_state_xpath))
+        )
+        
         self.click(out_of_state_tab)
 
         for element in const.COST_ELEMENTS:
@@ -95,5 +99,8 @@ if __name__ == "__main__":
         scraper_session.scrape_all()
     except NotFoundError:
         print(f"'{school}' cannot be found. Make sure to type in the school's full name correctly")
+        driver.quit()
+    except TimeoutException:
+        print("Timeout. Check network connection")
         driver.quit()
     
