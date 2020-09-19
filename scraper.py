@@ -8,8 +8,14 @@ from constants import DEADLINE, ADMISSION, COST
 
 URL = "https://bigfuture.collegeboard.org/college-university-search/drexel-university"
 
+def generate_URL(school_name):
+    school_url_path = school_name.replace(" ", "-").lower()
+    return const.BIGFUTURE_DOMAIN + school_url_path
 
 class CollegeBoardScaper:
+    """
+    Initiating a scraper session
+    """
     def __init__(self, web_driver):
         self.driver = web_driver
     
@@ -18,6 +24,10 @@ class CollegeBoardScaper:
         Special click using Javascript because normal Selenium click does not work
         """
         self.driver.execute_script("arguments[0].click();", element_to_click)
+
+    def check_valid_page(self, school_name):
+        if (self.driver.current_url == const.BIGFUTURE_ERROR):
+            raise NotFoundError(school_name)
 
     def find_and_set_content(self, info_element):
         info_element.content = self.driver.find_element_by_xpath(info_element.xpath).text
@@ -65,10 +75,25 @@ class CollegeBoardScaper:
         self.scrape_cost()
         self.driver.quit()
     
+class NotFoundError(Exception):
+    """Exception raised for school names that cannot be found on CollegeBoard"""
+    def __init__(self, invalid_school, message="Cannot find school"):
+        self.school = invalid_school
+        self.message = message
+        super().__init__(self.message)
+
 
 if __name__ == "__main__":
+    school = input("Enter school name to search: ")
+    URL = generate_URL(school)
     driver = webdriver.Safari()
-    driver.get(URL)
     driver.implicitly_wait(15)
     scraper_session = CollegeBoardScaper(driver)
-    scraper_session.scrape_all()
+    try:
+        driver.get(URL)
+        scraper_session.check_valid_page(school)
+        scraper_session.scrape_all()
+    except NotFoundError:
+        print(f"'{school}' cannot be found. Make sure to type in the school's full name correctly")
+        driver.quit()
+    
