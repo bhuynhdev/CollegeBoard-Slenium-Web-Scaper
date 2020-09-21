@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import data
 from constants import DEADLINE, ADMISSION, COST, BIGFUTURE_DOMAIN, BIGFUTURE_ERROR
+import excel
 
 def generate_URL(school_name):
     school_url_path = school_name.replace(" ", "-").lower()
@@ -62,7 +63,7 @@ class CollegeBoardScaper:
         self.click(cost_tab)
         # Wait for the Cost page to load fully; it loads quite slowly
         out_of_state_xpath = '//*[@id="cpProfile_tabs_paying_outstatecosts_anchor"]/a'
-        out_of_state_tab = WebDriverWait(self.driver, 30).until(
+        out_of_state_tab = WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.XPATH, out_of_state_xpath))
         )
         
@@ -129,4 +130,5 @@ def run_from_file(input_file) -> dict:
     return all_results
    
 if __name__ == "__main__":
-    run_from_file("schools.txt")
+    all_results = run_from_file("schools.txt")
+    excel.create_csv(all_results)
