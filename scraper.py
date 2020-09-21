@@ -16,7 +16,6 @@ class CollegeBoardScaper:
     """
     def __init__(self, web_driver):
         self.driver = web_driver
-        self.result = dict()
     
     def click(self, element_to_click):
         """
@@ -24,19 +23,19 @@ class CollegeBoardScaper:
         """
         self.driver.execute_script("arguments[0].click();", element_to_click)
 
-    def check_valid_page(self, school_name):
+    def check_valid_page(self, school):
         if (self.driver.current_url == BIGFUTURE_ERROR):
-            raise NotFoundError(school_name)
+            raise NotFoundError(school)
 
     def find_and_set_content(self, info_element):
         info_element.content = self.driver.find_element_by_xpath(info_element.xpath).text
-        print(f"{info_element.desp}: {info_element.content}")
+        # print(f"{info_element.desp}: {info_element.content}")
 
     def scrape_deadlines(self):
         deadlines_tab = self.driver.find_element_by_link_text(DEADLINE)
         self.click(deadlines_tab)
         # For loops to scrape all elements at once
-        for (date_element, month_element) in data.DEADLINE_ELEMENTS:
+        for (date_element, month_element) in data.DEADLINE_TUPLE_ELEMENTS:
             self.find_and_set_content(date_element)
             self.find_and_set_content(month_element)
     
@@ -76,10 +75,7 @@ class CollegeBoardScaper:
         self.scrape_admission()
         self.scrape_deadlines()
         self.scrape_cost()
-        self.driver.quit()
-
-        
-   
+ 
 class NotFoundError(Exception):
     """Exception raised for school names that cannot be found on CollegeBoard"""
     def __init__(self, invalid_school, message="Cannot find school"):
@@ -100,10 +96,37 @@ def run_from_command_line():
         scraper_session.scrape_all()
     except NotFoundError:
         print(f"'{school}' cannot be found. Make sure to type in the school's full name correctly")
-        driver.quit()
     except TimeoutException:
         print("Timeout. Check network connection")
+    finally:
         driver.quit()
+
+
+def run_from_file(input_file) -> dict:
+    all_results = [] # List of dictionaries to store all resulets
+    driver = webdriver.Safari()
+    driver.implicitly_wait(10)
+    scraper_session = CollegeBoardScaper(driver)
+    with open(input_file) as school_list:
+        for school in school_list:
+            school = school.rstrip()
+            print(school)
+            URL = generate_URL(school)
+            try:
+                driver.get(URL)
+                scraper_session.check_valid_page(school)
+                scraper_session.scrape_all()
+
+                school_result = data.generate_dict(school_name=school)
+                all_results.append(school_result)
+            except NotFoundError:
+                print(f"'{school}' cannot be found. Make sure to type in the school's full name correctly")
+            except TimeoutException:
+                print(f"Timeout for {school}. Check network connection")
+            finally:
+                print("Done")
+    driver.quit()
+    return all_results
    
 if __name__ == "__main__":
-    run_from_command_line()
+    run_from_file("schools.txt")

@@ -42,7 +42,8 @@ ed2.month.xpath = '//*[@id="topFrame"]/div[2]/div[2]/div/div/div/div[1]/div[2]/d
 ed2.date.xpath = '//*[@id="topFrame"]/div[2]/div[2]/div/div/div/div[1]/div[2]/div[2]/div[2]/div[1]/div[2]'
 
 deadline_object_list = [rd, ea, ed1, ed2]
-DEADLINE_ELEMENTS = [(x.date, x.month) for x in deadline_object_list]
+DEADLINE_TUPLE_ELEMENTS = [(x.date, x.month) for x in deadline_object_list]
+DEADLINE_ELEMENTS = [x for date_month_tuple in DEADLINE_TUPLE_ELEMENTS for x in date_month_tuple ]
 
 
 # Admission info: admission rate, SAT, etc.
