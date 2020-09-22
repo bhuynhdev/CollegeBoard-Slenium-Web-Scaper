@@ -142,4 +142,3 @@ def run_from_file(input_file) -> dict:
    
 if __name__ == "__main__":
     all_results = run_from_file("schools.txt")
-    excel.create_csv(all_results)

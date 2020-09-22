@@ -9,7 +9,6 @@ class InfoElement:
     """
     A helper class to store and organize information
     """
-
     def __init__(self, category, description):
         self.category = category
         self.xpath = ""
