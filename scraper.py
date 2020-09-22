@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import values
 from constants import DEADLINE, ADMISSION, COST, BIGFUTURE_DOMAIN, BIGFUTURE_ERROR
-import excel
+
 
 def generate_URL(school_name):
     school_url_path = school_name.replace(" ", "-").lower()
@@ -22,6 +22,12 @@ def construct_school_dict(school_name):
         school[field] = ""
     return school
 
+def check_school_existed(school_name, database):
+    """
+    Check from the mongoDB to see if school has already been scraped
+    """
+    find_result = database.find_by_criterion("Name", school_name)
+    return (len(find_result) > 0)
 
 class CollegeBoardScaper:
     """
@@ -116,7 +122,7 @@ def run_from_command_line():
         driver.quit()
 
 
-def run_from_file(input_file) -> dict:
+def run_from_file(input_file, existed_school_list) -> dict:
     all_results = [] # List of dictionaries to store all results
     driver = webdriver.Safari()
     driver.implicitly_wait(10)
@@ -124,6 +130,9 @@ def run_from_file(input_file) -> dict:
         for school_name in school_list:
             school_name = school_name.rstrip()
             print(school_name)
+            if school_name in existed_school_list:
+                print(f"{school_name} already in database")
+                continue
             URL = generate_URL(school_name)
             scraper_session = CollegeBoardScaper(driver, school_name)
             try:
@@ -139,7 +148,3 @@ def run_from_file(input_file) -> dict:
                 print("Done")
     driver.quit()
     return all_results
-   
-if __name__ == "__main__":
-    all_results = run_from_file("schools.txt")
-    excel.create_csv(all_results)

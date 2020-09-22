@@ -1,0 +1,2 @@
+selenium==3.141.0
+pymongo[tls,srv,gssapi]==3.11.0
