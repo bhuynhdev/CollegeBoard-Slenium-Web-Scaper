@@ -1,1 +1,3 @@
-Admission rate,SAT range,ACT range,Regular decision Date,Regular decision Month,Early action Date,Early action Month,Early decision 1 Date,Early decision 1 Month,Early decision 2 Date,Early decision 2 Month,Out-of-state tuition,Room and board,Out-of-state total cost
+Name,Admission rate,SAT range,ACT range,RD DATE,RD Month,EA Date,EA Month,ED1 Date,ED1 Month,ED2 Date,ED2 Month,Out-of-state tuition,ROOM and boaRD,Out-of-state total cost
+University of Cincinnati,77% of applicants admitted,1120-1350,23-29,1,Mar,--,,--,,--,,"$27,472","$10,054",--
+Drexel University,75% of applicants admitted,1190-1390,25-31,15,Jan,1,Nov,1,Nov,--,,"$56,238","$16,008","$75,146"

@@ -1,17 +1,14 @@
 import csv
 import openpyxl
 
-from data import ALL_ELEMENTS
+from values import FIELD_NAMES
 
-def generate_field_names(all_elements):
-    return [x.desp for x in all_elements]
-
-def create_csv(result_dict):
+def create_csv(all_results_dict):
     with open("result.csv", "w") as csvfile:
-        fieldnames = generate_field_names(ALL_ELEMENTS)
+        fieldnames = ["Name"] + FIELD_NAMES
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        for dictionary in result_dict:
-            writer.writerow(dictionary)
+        for school_dict in all_results_dict:
+            writer.writerow(school_dict)
 
